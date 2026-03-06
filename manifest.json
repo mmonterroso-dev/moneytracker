@@ -2,7 +2,7 @@
   "name": "MoneyTracker — Gestión Financiera",
   "short_name": "MoneyTracker",
   "description": "Gestión de ingresos y gastos personales en Soles PEN",
-  "start_url": "/index.html",
+  "start_url": "/landing.html",
   "display": "standalone",
   "background_color": "#0a0c12",
   "theme_color": "#0a0c12",
