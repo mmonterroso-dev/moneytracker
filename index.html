@@ -46,7 +46,6 @@
       filter: drop-shadow(0 0 20px rgba(255,181,71,0.5));
     }
 
-    /* Typewriter name */
     .landing-name {
       margin-top: 20px;
       font-family: 'DM Serif Display', serif;
@@ -119,26 +118,30 @@
     const CHAR_MS  = 80;
     const START_MS = 700;
 
-    // Keyboard click sound via Web Audio API
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playKeyClick() {
-      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.06, ctx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 6) * 0.18;
-      }
-      const src = ctx.createBufferSource();
-      src.buffer = buf;
-
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
       const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 1800;
-      filter.Q.value = 1.2;
 
-      src.connect(filter);
-      filter.connect(ctx.destination);
-      src.start();
+      filter.type = 'lowpass';
+      filter.frequency.value = 900;
+      filter.Q.value = 0.5;
+
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.04);
+
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.06);
     }
 
     function typeWriter() {
@@ -162,7 +165,6 @@
       setTimeout(next, START_MS);
     }
 
-    // iOS requires user gesture to unlock AudioContext — resume on first touch
     document.addEventListener('touchstart', () => {
       if (ctx.state === 'suspended') ctx.resume();
     }, { once: true, passive: true });
@@ -172,6 +174,7 @@
     btn.addEventListener('touchstart', () => btn.classList.add('tapped'),   { passive: true });
     btn.addEventListener('touchend',   () => btn.classList.remove('tapped'));
     btn.addEventListener('touchcancel',() => btn.classList.remove('tapped'));
+
   </script>
 </body>
 </html>
