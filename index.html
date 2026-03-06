@@ -17,6 +17,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="home-page">
+    <div class="splash" id="splash">
+    <div class="splash-inner">
+      <img src="icono-moneda.png" alt="" class="splash-icon" />
+      <span class="splash-name">MoneyTracker</span>
+    </div>
+  </div>
+
   <div class="grain"></div>
   <div class="bg-orbs">
     <div class="orb orb-1"></div>
@@ -89,12 +96,21 @@
     const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     const now = new Date();
     document.getElementById('home-period').textContent = `${months[now.getMonth()]} ${now.getFullYear()}`;
+
     if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
-    
+
     document.querySelectorAll('.home-card').forEach(card => {
       card.addEventListener('touchstart', () => card.classList.add('tapped'), { passive: true });
       card.addEventListener('touchend',   () => card.classList.remove('tapped'));
       card.addEventListener('touchcancel',() => card.classList.remove('tapped'));
+    });
+
+    window.addEventListener('load', () => {
+      const splash = document.getElementById('splash');
+      setTimeout(() => {
+        splash.classList.add('splash-hide');
+        setTimeout(() => splash.remove(), 600);
+      }, 1200);
     });
   </script>
 </body>

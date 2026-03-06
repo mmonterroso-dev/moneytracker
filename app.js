@@ -38,8 +38,7 @@ function render() {
   document.getElementById('total-gastos').textContent   = PEN(tGastos);
   document.getElementById('total-balance').textContent  = PEN(balance);
 
-  const balanceEl = document.getElementById('total-balance');
-  balanceEl.style.color = balance >= 0
+  document.getElementById('total-balance').style.color = balance >= 0
     ? 'var(--accent-blue)'
     : 'var(--accent-red)';
 
@@ -62,15 +61,56 @@ function renderList(cat, entries) {
 
   entries.forEach((entry, i) => {
     const item = document.createElement('div');
-    item.className = 'entry-item';
+    item.className = 'entry-item swipeable';
     item.innerHTML = `
-      <span class="entry-name" title="${entry.name}">${entry.name}</span>
-      <span class="entry-amount">${PEN(entry.amount)}</span>
-      <div class="entry-actions">
-        <button class="btn-icon" data-action="edit" data-cat="${cat}" data-i="${i}" title="Editar">✎</button>
-        <button class="btn-icon delete" data-action="delete" data-cat="${cat}" data-i="${i}" title="Eliminar">✕</button>
+      <div class="swipe-delete-bg"><span>Eliminar</span></div>
+      <div class="swipe-content">
+        <span class="entry-name" title="${entry.name}">${entry.name}</span>
+        <span class="entry-amount">${PEN(entry.amount)}</span>
+        <div class="entry-actions">
+          <button class="btn-icon" data-action="edit" data-cat="${cat}" data-i="${i}" title="Editar">✎</button>
+          <button class="btn-icon delete" data-action="delete" data-cat="${cat}" data-i="${i}" title="Eliminar">✕</button>
+        </div>
       </div>`;
     list.appendChild(item);
+    initSwipe(item, cat, i);
+  });
+}
+
+function initSwipe(item, cat, index) {
+  const content = item.querySelector('.swipe-content');
+  const bg      = item.querySelector('.swipe-delete-bg');
+  let startX = 0, currentX = 0, dragging = false;
+  const THRESHOLD = 75;
+
+  content.addEventListener('touchstart', e => {
+    startX   = e.touches[0].clientX;
+    dragging = true;
+    content.style.transition = 'none';
+  }, { passive: true });
+
+  content.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    currentX = Math.min(0, e.touches[0].clientX - startX);
+    const clamped = Math.max(currentX, -THRESHOLD * 1.5);
+    content.style.transform = `translateX(${clamped}px)`;
+    bg.style.opacity = Math.min(Math.abs(clamped) / THRESHOLD, 1);
+  }, { passive: true });
+
+  content.addEventListener('touchend', () => {
+    dragging = false;
+    content.style.transition = 'transform 240ms ease';
+    if (currentX < -THRESHOLD) {
+      content.style.transform = 'translateX(-100%)';
+      item.style.transition   = 'max-height 300ms ease, opacity 300ms ease';
+      item.style.overflow     = 'hidden';
+      setTimeout(() => { item.style.maxHeight = '0'; item.style.opacity = '0'; }, 10);
+      setTimeout(() => deleteEntry(cat, index), 320);
+    } else {
+      content.style.transform = 'translateX(0)';
+      bg.style.opacity = '0';
+    }
+    currentX = 0;
   });
 }
 
@@ -90,6 +130,12 @@ function addEntry(cat) {
   amtEl.value  = '';
   nameEl.focus();
   render();
+
+  const first = document.getElementById(`list-${cat}`).firstElementChild;
+  if (first) {
+    first.classList.add('entry-pop');
+    first.addEventListener('animationend', () => first.classList.remove('entry-pop'), { once: true });
+  }
 }
 
 function deleteEntry(cat, index) {
@@ -97,7 +143,6 @@ function deleteEntry(cat, index) {
   const removed = data[cat].splice(index, 1)[0];
   saveData(data);
   render();
-
   deleteUndo = { cat, index, entry: removed };
   showToast(`"${removed.name}" eliminado`);
 }

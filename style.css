@@ -153,7 +153,6 @@ body {
 #sum-gastos   .sum-amount { color: var(--accent-red); }
 #sum-balance  .sum-amount { color: var(--accent-blue); }
 
-/* ─── TAB NAV ────────────────────────────── */
 .tab-nav {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -190,7 +189,6 @@ body {
 .tab-btn[data-tab="variables"].active { border-color: var(--accent-amber); }
 .tab-btn[data-tab="ahorros"].active   { border-color: var(--accent-blue); }
 
-/* ─── TAB CONTENT ────────────────────────── */
 .tab-content { display: none; padding: 20px; animation: fadeIn 200ms ease; }
 .tab-content.active { display: block; }
 
@@ -199,7 +197,6 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── CATEGORY HEADER ────────────────────── */
 .category-header {
   display: flex;
   justify-content: space-between;
@@ -254,7 +251,6 @@ body {
 #tab-variables .category-total { color: var(--accent-amber); }
 #tab-ahorros   .category-total { color: var(--accent-blue); }
 
-/* ─── ENTRIES LIST ───────────────────────── */
 .entries-list {
   display: flex;
   flex-direction: column;
@@ -336,7 +332,6 @@ body {
   border-radius: var(--radius-sm);
 }
 
-/* ─── ADD FORM ───────────────────────────── */
 .add-entry-form {
   display: flex;
   gap: 8px;
@@ -383,7 +378,6 @@ body {
 #tab-variables .btn-add { background: var(--accent-amber); color: #0c0e14; }
 #tab-ahorros   .btn-add { background: var(--accent-blue);  color: #0c0e14; }
 
-/* ─── MODAL ──────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -459,7 +453,6 @@ body {
 .btn-save   { background: var(--accent-blue); color: #0c0e14; }
 .btn-cancel:hover, .btn-save:hover { opacity: 0.85; }
 
-/* ─── TOAST ──────────────────────────────── */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -492,12 +485,10 @@ body {
   padding: 0;
 }
 
-/* ─── SCROLLBAR ──────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-/* ─── RESPONSIVE ─────────────────────────── */
 @media (max-width: 480px) {
   .topbar-period { font-size: 11px; gap: 6px; }
   .tab-btn { font-size: 11px; padding: 10px 4px; }
@@ -511,7 +502,6 @@ body {
   .summary-bar { border-radius: 0; }
 }
 
-/* ─── TOPBAR UPDATE ──────────────────────── */
 .topbar-left {
   display: flex;
   align-items: center;
@@ -536,7 +526,6 @@ body {
 .back-btn:hover { color: var(--text); background: #252a3a; }
 .topbar-transparent { background: rgba(12,14,20,0.6); }
 
-/* ─── HOME PAGE ──────────────────────────── */
 .home-page { min-height: 100dvh; display: flex; flex-direction: column; }
 
 .bg-orbs { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
@@ -934,31 +923,185 @@ body {
 .donut-legend {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 20px;
+  gap: 16px 20px;
   margin-top: 20px;
+  width: 100%;
 }
 
 .legend-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
 .legend-name {
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
   color: var(--text-muted);
-  flex: 1;
 }
 
 .legend-val {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 15px;
+  font-weight: 500;
   color: var(--text);
+  padding-left: 14px;
 }
+/* ─── SWIPE TO DELETE ────────────────────── */
+.entry-item.swipeable {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.swipe-delete-bg {
+  position: absolute;
+  inset: 0;
+  background: #c0392b;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 20px;
+  opacity: 0;
+  transition: opacity 80ms;
+  border-radius: var(--radius-sm);
+}
+
+.swipe-delete-bg span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.swipe-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  will-change: transform;
+}
+
+/* ─── SHARE BUTTON ───────────────────────── */
+.share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: none;
+  border: 1px solid #2e3450;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+.share-btn:hover { border-color: #5b9cf6; color: #5b9cf6; }
+
+/* ─── SHARE CARD (screenshot) ────────────── */
+.share-card {
+  position: fixed;
+  top: -9999px;
+  left: 20px;
+  width: 320px;
+  flex-direction: column;
+  gap: 16px;
+  background: #14171f;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #2e3450;
+}
+
+.share-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.share-card-app {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: #fff;
+}
+
+.share-card-period {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.share-card-balance {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.share-card-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid #2e3450;
+  padding-top: 16px;
+}
+
+.share-card-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sc-label {
+  flex: 1;
+  font-size: 13px;
+  color: #9ca3af;
+  font-family: var(--font-body);
+}
+
+.sc-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #fff;
+}
+
+.share-card-footer {
+  font-size: 11px;
+  color: #4b5563;
+  font-family: var(--font-mono);
+  text-align: center;
+  border-top: 1px solid #1e2433;
+  padding-top: 12px;
+}
+
+/* ─── ENTRY POP ──────────────────────────── */
+@keyframes entryPop {
+  0%   { transform: scale(0.94); opacity: 0; }
+  60%  { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.entry-pop { animation: entryPop 300ms cubic-bezier(0.34,1.56,0.64,1) forwards; }

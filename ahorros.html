@@ -63,6 +63,22 @@
     document.getElementById('ringFill').style.strokeDasharray = CIRCUMFERENCE;
     document.getElementById('ringFill').style.strokeDashoffset = CIRCUMFERENCE;
 
+
+    function countUp(el, target, duration = 900) {
+      const start = parseFloat(el.dataset.current || 0);
+      el.dataset.current = target;
+      const diff = target - start;
+      const startTime = performance.now();
+      function step(now) {
+        const p = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = (start + diff * ease).toFixed(2);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target.toFixed(2);
+      }
+      requestAnimationFrame(step);
+    }
+
     function sum(arr) { return arr.reduce((s, e) => s + e.amount, 0); }
 
     function getAllPeriods() {
@@ -99,7 +115,7 @@
         if (a > 0) byMonth.push({ label: `${MONTHS[p.month]} ${p.year}`, amount: a });
       });
 
-      document.getElementById('a-total').textContent = totalAhorros.toFixed(2);
+      countUp(document.getElementById('a-total'), totalAhorros);
 
       const pct = totalIngresos > 0 ? Math.min((totalAhorros / totalIngresos) * 100, 100) : 0;
       document.getElementById('a-sub').textContent = totalIngresos > 0

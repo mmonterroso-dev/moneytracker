@@ -1,8 +1,8 @@
-const CACHE = 'moneytracker-v2';
+const CACHE = 'moneytracker-v3';
 const ASSETS = [
   '/index.html', '/tracker.html', '/resumen.html', '/ahorros.html',
   '/style.css', '/app.js', '/manifest.json',
-  '/icons/icon-192.png', '/icons/icon-512.png'
+  '/icono-moneda.png', '/icono-wallet.png'
 ];
 
 self.addEventListener('install', e => {

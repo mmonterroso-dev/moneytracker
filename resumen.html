@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
   <div class="grain"></div>
@@ -47,6 +48,8 @@
       <button class="resumen-change-btn" id="changePeriod">Cambiar</button>
     </div>
 
+    <button class="share-btn" id="shareBtn">&#8679; Compartir resumen</button>
+
     <section class="resumen-hero">
       <span class="resumen-hero-label">Distribución del mes</span>
 
@@ -60,23 +63,19 @@
 
       <div class="donut-legend">
         <div class="legend-item">
-          <span class="legend-dot" style="background:#3ddc84"></span>
-          <span class="legend-name">Ingresos</span>
+          <span class="legend-name"><span class="legend-dot" style="background:#3ddc84"></span>Ingresos</span>
           <span class="legend-val" id="leg-ingresos">PEN 0.00</span>
         </div>
         <div class="legend-item">
-          <span class="legend-dot" style="background:#ff5f6d"></span>
-          <span class="legend-name">G. Fijos</span>
+          <span class="legend-name"><span class="legend-dot" style="background:#ff5f6d"></span>Gastos Fijos</span>
           <span class="legend-val" id="leg-fijos">PEN 0.00</span>
         </div>
         <div class="legend-item">
-          <span class="legend-dot" style="background:#ffb547"></span>
-          <span class="legend-name">G. Variables</span>
+          <span class="legend-name"><span class="legend-dot" style="background:#ffb547"></span>Gastos Variables</span>
           <span class="legend-val" id="leg-variables">PEN 0.00</span>
         </div>
         <div class="legend-item">
-          <span class="legend-dot" style="background:#5b9cf6"></span>
-          <span class="legend-name">Ahorros</span>
+          <span class="legend-name"><span class="legend-dot" style="background:#5b9cf6"></span>Ahorros</span>
           <span class="legend-val" id="leg-ahorros">PEN 0.00</span>
         </div>
       </div>
@@ -128,6 +127,21 @@
       </div>
     </section>
 
+    <div class="share-card" id="shareCard" style="display:none">
+      <div class="share-card-header">
+        <span class="share-card-app">MoneyTracker</span>
+        <span class="share-card-period" id="sc-period"></span>
+      </div>
+      <div class="share-card-balance" id="sc-balance"></div>
+      <div class="share-card-rows">
+        <div class="share-card-row"><span class="sc-dot" style="background:#3ddc84"></span><span class="sc-label">Ingresos</span><span class="sc-val" id="sc-ingresos"></span></div>
+        <div class="share-card-row"><span class="sc-dot" style="background:#ff5f6d"></span><span class="sc-label">Gastos Fijos</span><span class="sc-val" id="sc-fijos"></span></div>
+        <div class="share-card-row"><span class="sc-dot" style="background:#ffb547"></span><span class="sc-label">Gastos Variables</span><span class="sc-val" id="sc-variables"></span></div>
+        <div class="share-card-row"><span class="sc-dot" style="background:#5b9cf6"></span><span class="sc-label">Ahorros</span><span class="sc-val" id="sc-ahorros"></span></div>
+      </div>
+      <div class="share-card-footer">MoneyTracker · mmonterroso-dev.github.io/moneytracker</div>
+    </div>
+
   </div>
 
   <script>
@@ -173,6 +187,21 @@
       document.getElementById('view-resumen').style.display = 'flex';
       document.getElementById('r-period-label').textContent = `${MONTHS[activeMonth]} ${activeYear}`;
       renderResumen();
+    }
+
+    function countUp(el, target, duration = 700) {
+      const start = parseFloat(el.dataset.current || 0);
+      el.dataset.current = target;
+      const diff = target - start;
+      const startTime = performance.now();
+      function step(now) {
+        const p = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = 'PEN ' + (start + diff * ease).toFixed(2);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = PEN(target);
+      }
+      requestAnimationFrame(step);
     }
 
     function sum(arr) { return arr.reduce((s, e) => s + e.amount, 0); }
@@ -246,10 +275,10 @@
       const bal = tI - tG;
 
       const balColor = bal >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-      document.getElementById('donut-balance').textContent = PEN(bal);
+      countUp(document.getElementById('donut-balance'), bal);
       document.getElementById('donut-balance').style.color = balColor;
-      document.getElementById('r-ingresos').textContent = PEN(tI);
-      document.getElementById('r-gastos').textContent   = PEN(tG);
+      countUp(document.getElementById('r-ingresos'), tI);
+      countUp(document.getElementById('r-gastos'), tG);
 
       document.getElementById('leg-ingresos').textContent  = PEN(tI);
       document.getElementById('leg-fijos').textContent     = PEN(tF);
@@ -263,6 +292,51 @@
         renderItems(`bi-${c}`, d[c]);
       });
     }
+
+
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      if (!activeYear) return;
+      const key = 'moneytracker-' + activeYear + '-' + String(activeMonth + 1).padStart(2, '0');
+      const raw = localStorage.getItem(key);
+      const d = raw ? JSON.parse(raw) : { ingresos:[], fijos:[], variables:[], ahorros:[] };
+      const tI = d.ingresos.reduce((s,e) => s+e.amount, 0);
+      const tF = d.fijos.reduce((s,e) => s+e.amount, 0);
+      const tV = d.variables.reduce((s,e) => s+e.amount, 0);
+      const tA = d.ahorros.reduce((s,e) => s+e.amount, 0);
+      const bal = tI - (tF + tV + tA);
+
+      const card = document.getElementById('shareCard');
+      document.getElementById('sc-period').textContent   = MONTHS[activeMonth] + ' ' + activeYear;
+      document.getElementById('sc-balance').textContent  = PEN(bal);
+      document.getElementById('sc-balance').style.color  = bal >= 0 ? '#3ddc84' : '#ff5f6d';
+      document.getElementById('sc-ingresos').textContent  = PEN(tI);
+      document.getElementById('sc-fijos').textContent     = PEN(tF);
+      document.getElementById('sc-variables').textContent = PEN(tV);
+      document.getElementById('sc-ahorros').textContent   = PEN(tA);
+
+      card.style.display = 'flex';
+      await new Promise(r => setTimeout(r, 60));
+
+      try {
+        const canvas = await html2canvas(card, { backgroundColor: '#14171f', scale: 2, useCORS: true });
+        card.style.display = 'none';
+        canvas.toBlob(async blob => {
+          const fname = 'resumen-' + MONTHS[activeMonth] + '-' + activeYear + '.png';
+          const file  = new File([blob], fname, { type: 'image/png' });
+          if (navigator.share && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: 'MoneyTracker' });
+          } else {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = fname;
+            a.click();
+          }
+        }, 'image/png');
+      } catch(err) {
+        card.style.display = 'none';
+        console.error(err);
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', initPicker);
   </script>
