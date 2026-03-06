@@ -24,6 +24,22 @@ function catTotal(entries) {
   return entries.reduce((s, e) => s + e.amount, 0);
 }
 
+
+function countUp(el, target, duration = 600) {
+  const start = parseFloat(el.dataset.current || 0);
+  el.dataset.current = target;
+  const diff = target - start;
+  const startTime = performance.now();
+  function step(now) {
+    const p = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = 'PEN ' + (start + diff * ease).toFixed(2);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = 'PEN ' + target.toFixed(2);
+  }
+  requestAnimationFrame(step);
+}
+
 function render() {
   const data = loadData();
 
@@ -34,9 +50,9 @@ function render() {
   const tGastos    = tFijos + tVariables + tAhorros;
   const balance    = tIngresos - tGastos;
 
-  document.getElementById('total-ingresos').textContent = PEN(tIngresos);
-  document.getElementById('total-gastos').textContent   = PEN(tGastos);
-  document.getElementById('total-balance').textContent  = PEN(balance);
+  countUp(document.getElementById('total-ingresos'), tIngresos);
+  countUp(document.getElementById('total-gastos'), tGastos);
+  countUp(document.getElementById('total-balance'), balance);
 
   document.getElementById('total-balance').style.color = balance >= 0
     ? 'var(--accent-blue)'
@@ -69,7 +85,6 @@ function renderList(cat, entries) {
         <span class="entry-amount">${PEN(entry.amount)}</span>
         <div class="entry-actions">
           <button class="btn-icon" data-action="edit" data-cat="${cat}" data-i="${i}" title="Editar">✎</button>
-          <button class="btn-icon delete" data-action="delete" data-cat="${cat}" data-i="${i}" title="Eliminar">✕</button>
         </div>
       </div>`;
     list.appendChild(item);
