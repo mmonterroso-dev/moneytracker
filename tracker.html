@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="MoneyTracker" />
-  <title>MoneyTracker - Gastos e Ingresos</title>
+  <title>MoneyTracker — Gastos e Ingresos</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icono-moneda.png" />
+  <link rel="apple-touch-icon" href="icono-moneda.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
@@ -23,6 +23,7 @@
     <div class="topbar-left">
       <a href="index.html" class="back-btn">&#8592;</a>
       <div class="topbar-brand">
+        <span class="brand-symbol">PEN</span>
         <span class="brand-name">MoneyTracker</span>
       </div>
     </div>
@@ -62,6 +63,7 @@
           <span class="category-icon">↑</span>
           <div>
             <h2>Ingresos</h2>
+            <p class="category-desc">Sueldos, honorarios, rentas y otras entradas</p>
           </div>
         </div>
         <span class="category-total" id="cat-total-ingresos">PEN 0.00</span>
@@ -80,6 +82,7 @@
           <span class="category-icon">↓</span>
           <div>
             <h2>Gastos Fijos</h2>
+            <p class="category-desc">Alquiler, servicios, suscripciones recurrentes</p>
           </div>
         </div>
         <span class="category-total" id="cat-total-fijos">PEN 0.00</span>
@@ -98,6 +101,7 @@
           <span class="category-icon">~</span>
           <div>
             <h2>Gastos Variables</h2>
+            <p class="category-desc">Alimentación, transporte, ocio y compras</p>
           </div>
         </div>
         <span class="category-total" id="cat-total-variables">PEN 0.00</span>
@@ -116,6 +120,7 @@
           <span class="category-icon">◆</span>
           <div>
             <h2>Ahorros</h2>
+            <p class="category-desc">Fondos de emergencia, metas, inversiones</p>
           </div>
         </div>
         <span class="category-total" id="cat-total-ahorros">PEN 0.00</span>

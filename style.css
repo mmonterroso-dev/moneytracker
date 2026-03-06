@@ -873,3 +873,9 @@ body {
   0%, 100% { filter: drop-shadow(0 0 6px rgba(245,168,0,0.6)); transform: scale(1); }
   50%       { filter: drop-shadow(0 0 14px rgba(255,220,80,0.9)); transform: scale(1.05); }
 }
+
+.home-coin-img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}

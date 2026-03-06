@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#0a0c12" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>MoneyTracker - Ahorros</title>
+  <title>MoneyTracker — Ahorros</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icono-moneda.png" />
+  <link rel="apple-touch-icon" href="icono-moneda.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
@@ -23,6 +23,7 @@
     <div class="topbar-left">
       <a href="index.html" class="back-btn">&#8592;</a>
       <div class="topbar-brand">
+        <span class="brand-symbol">PEN</span>
         <span class="brand-name">Ahorros</span>
       </div>
     </div>
@@ -31,7 +32,7 @@
   <main class="ahorros-main">
 
     <section class="ahorros-hero">
-      <p class="ahorros-hero-label">Historial de Ahorro</p>
+      <p class="ahorros-hero-label">Total ahorrado — todos los meses</p>
       <div class="ahorros-hero-amount-wrap">
         <span class="ahorros-currency">PEN</span>
         <span class="ahorros-hero-amount" id="a-total">0.00</span>
@@ -45,6 +46,7 @@
         <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="80" />
         <text class="ring-pct" id="ringPct" x="100" y="107" text-anchor="middle">0%</text>
       </svg>
+      <p class="ring-caption">de tus ingresos totales</p>
     </section>
 
     <section class="ahorros-list-section">

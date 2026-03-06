@@ -9,8 +9,8 @@
   <meta name="apple-mobile-web-app-title" content="MoneyTracker" />
   <title>MoneyTracker</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icono-moneda.png" />
+  <link rel="apple-touch-icon" href="icono-moneda.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
@@ -27,34 +27,10 @@
   <div class="home-wrapper">
     <header class="home-header">
       <div class="home-brand">
-        <span class="home-coin-icon">
-          <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="coinGrad" cx="38%" cy="32%" r="65%">
-                <stop offset="0%"   stop-color="#ffe97a"/>
-                <stop offset="45%"  stop-color="#f5a800"/>
-                <stop offset="100%" stop-color="#b36a00"/>
-              </radialGradient>
-              <radialGradient id="shineGrad" cx="35%" cy="25%" r="50%">
-                <stop offset="0%"  stop-color="#fff" stop-opacity="0.55"/>
-                <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
-              </radialGradient>
-              <filter id="coinGlow">
-                <feGaussianBlur stdDeviation="2.5" result="blur"/>
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-            <circle cx="19" cy="19" r="17" fill="#b36a00" opacity="0.5"/>
-            <circle cx="19" cy="18" r="17" fill="url(#coinGrad)" filter="url(#coinGlow)"/>
-            <circle cx="19" cy="18" r="17" fill="url(#shineGrad)"/>
-            <circle cx="19" cy="18" r="14" fill="none" stroke="#f5c800" stroke-width="0.8" opacity="0.6"/>
-            <text x="19" y="23.5" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#7a3d00" opacity="0.35">$</text>
-            <text x="19" y="23" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#fff8e0">$</text>
-          </svg>
-        </span>
+        <span class="home-coin-icon"><img src="icono-moneda.png" alt="MoneyTracker" class="home-coin-img" /></span>
         <h1 class="home-title">MoneyTracker</h1>
       </div>
-      <p class="home-subtitle">Your wallet with one tap</p>
+      <p class="home-subtitle">Your wallet with one tap.</p>
     </header>
 
     <nav class="home-nav">
