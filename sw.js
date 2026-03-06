@@ -1,4 +1,4 @@
-const CACHE = 'moneytracker-v3';
+const CACHE = 'moneytracker-v4';
 const ASSETS = [
   '/landing.html', '/index.html', '/tracker.html', '/resumen.html', '/ahorros.html',
   '/style.css', '/app.js', '/manifest.json',
