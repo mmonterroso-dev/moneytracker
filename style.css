@@ -1211,10 +1211,14 @@ body {
   border-radius: var(--radius-sm);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 15px;
   font-size: 16px !important;
   margin-bottom: 8px;
   box-sizing: border-box;
+}
+
+.goal-input::placeholder {
+  font-size: 13px;
+  color: var(--text-dim);
 }
 
 .goal-input:focus {
