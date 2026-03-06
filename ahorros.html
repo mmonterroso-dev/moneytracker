@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0c12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>MoneyTracker - Ahorros</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="ahorros-page">
+  <div class="grain"></div>
+  <div class="ahorros-bg-glow"></div>
+
+  <header class="topbar topbar-transparent">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn">&#8592;</a>
+      <div class="topbar-brand">
+        <span class="brand-name">Ahorros</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="ahorros-main">
+
+    <section class="ahorros-hero">
+      <p class="ahorros-hero-label">Historial de Ahorro</p>
+      <div class="ahorros-hero-amount-wrap">
+        <span class="ahorros-currency">PEN</span>
+        <span class="ahorros-hero-amount" id="a-total">0.00</span>
+      </div>
+      <p class="ahorros-hero-sub" id="a-sub"></p>
+    </section>
+
+    <section class="ahorros-ring-section">
+      <svg class="ahorros-ring" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle class="ring-track" cx="100" cy="100" r="80" />
+        <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="80" />
+        <text class="ring-pct" id="ringPct" x="100" y="107" text-anchor="middle">0%</text>
+      </svg>
+    </section>
+
+    <section class="ahorros-list-section">
+      <h3 class="ahorros-list-title">Desglose por mes</h3>
+      <div class="ahorros-list" id="a-list"></div>
+    </section>
+
+  </main>
+
+  <script>
+    const PEN = v => `PEN ${parseFloat(v).toFixed(2)}`;
+    const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const CIRCUMFERENCE = 2 * Math.PI * 80;
+
+    document.getElementById('ringFill').style.strokeDasharray = CIRCUMFERENCE;
+    document.getElementById('ringFill').style.strokeDashoffset = CIRCUMFERENCE;
+
+    function sum(arr) { return arr.reduce((s, e) => s + e.amount, 0); }
+
+    function getAllPeriods() {
+      const periods = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('moneytracker-')) {
+          const match = k.match(/^moneytracker-(\d{4})-(\d{2})$/);
+          if (match) periods.push({ key: k, year: parseInt(match[1]), month: parseInt(match[2]) - 1 });
+        }
+      }
+      return periods.sort((a, b) => b.year - a.year || b.month - a.month);
+    }
+
+    function animateRing(pct) {
+      const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+      document.getElementById('ringFill').style.strokeDashoffset = offset;
+      document.getElementById('ringPct').textContent = Math.round(pct) + '%';
+    }
+
+    function render() {
+      const periods = getAllPeriods();
+      let totalAhorros = 0, totalIngresos = 0;
+      const byMonth = [];
+
+      periods.forEach(p => {
+        const raw = localStorage.getItem(p.key);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        const a = sum(d.ahorros);
+        const ing = sum(d.ingresos);
+        totalAhorros  += a;
+        totalIngresos += ing;
+        if (a > 0) byMonth.push({ label: `${MONTHS[p.month]} ${p.year}`, amount: a });
+      });
+
+      document.getElementById('a-total').textContent = totalAhorros.toFixed(2);
+
+      const pct = totalIngresos > 0 ? Math.min((totalAhorros / totalIngresos) * 100, 100) : 0;
+      document.getElementById('a-sub').textContent = totalIngresos > 0
+        ? `Sobre un total de ${PEN(totalIngresos)} en ingresos`
+        : 'Agrega ingresos para ver el porcentaje';
+      animateRing(pct);
+
+      const list = document.getElementById('a-list');
+      if (!byMonth.length) {
+        list.innerHTML = `<div class="ahorros-empty">Sin ahorros registrados aún.<br>Agrégalos en Gastos e Ingresos → Ahorros.</div>`;
+        return;
+      }
+
+      const maxAmt = Math.max(...byMonth.map(m => m.amount));
+      list.innerHTML = byMonth.map(m => {
+        const barPct = maxAmt > 0 ? (m.amount / maxAmt) * 100 : 0;
+        return `<div class="a-item">
+          <div class="a-item-top">
+            <span class="a-item-name">${m.label}</span>
+            <span class="a-item-amt">${PEN(m.amount)}</span>
+          </div>
+          <div class="a-item-bar-track">
+            <div class="a-item-bar-fill" style="width:${barPct}%"></div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', render);
+  </script>
+</body>
+</html>

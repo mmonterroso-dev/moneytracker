@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0c12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>MoneyTracker - Resumen</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn">&#8592;</a>
+      <div class="topbar-brand">
+        <span class="brand-name">Resumen</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- SELECTOR VIEW -->
+  <div id="view-selector" class="picker-view">
+    <div class="picker-wrapper">
+      <h2 class="picker-title">Selecciona mes<br>y año</h2>
+
+      <div class="picker-year-row">
+        <button class="picker-arrow" id="py-prev">&#8592;</button>
+        <span class="picker-year-val" id="py-val"></span>
+        <button class="picker-arrow" id="py-next">&#8594;</button>
+      </div>
+
+      <div class="picker-months" id="picker-months"></div>
+
+      <button class="picker-confirm" id="picker-confirm" disabled>Ver resumen</button>
+    </div>
+  </div>
+
+  <!-- RESUMEN VIEW -->
+  <div id="view-resumen" class="resumen-main" style="display:none">
+
+    <div class="resumen-period-bar">
+      <span class="resumen-period-label" id="r-period-label"></span>
+      <button class="resumen-change-btn" id="changePeriod">Cambiar</button>
+    </div>
+
+    <section class="resumen-hero">
+      <span class="resumen-hero-label">Balance del mes</span>
+      <span class="resumen-hero-amount" id="r-balance">PEN 0.00</span>
+      <div class="balance-bar-wrap">
+        <div class="balance-bar-track">
+          <div class="balance-bar-fill" id="r-bar"></div>
+        </div>
+        <div class="balance-bar-labels">
+          <span>Gastos</span>
+          <span>Ingresos</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="resumen-cards">
+      <div class="r-card r-card-green">
+        <span class="r-card-label">Ingresos</span>
+        <span class="r-card-amount" id="r-ingresos">PEN 0.00</span>
+      </div>
+      <div class="r-card r-card-red">
+        <span class="r-card-label">Gastos</span>
+        <span class="r-card-amount" id="r-gastos">PEN 0.00</span>
+      </div>
+    </section>
+
+    <section class="resumen-breakdown">
+      <div class="breakdown-group">
+        <div class="breakdown-header">
+          <span class="breakdown-dot dot-green"></span>
+          <span class="breakdown-title">Ingresos</span>
+          <span class="breakdown-subtotal" id="bs-ingresos">PEN 0.00</span>
+        </div>
+        <div class="breakdown-items" id="bi-ingresos"></div>
+      </div>
+      <div class="breakdown-group">
+        <div class="breakdown-header">
+          <span class="breakdown-dot dot-red"></span>
+          <span class="breakdown-title">Gastos Fijos</span>
+          <span class="breakdown-subtotal" id="bs-fijos">PEN 0.00</span>
+        </div>
+        <div class="breakdown-items" id="bi-fijos"></div>
+      </div>
+      <div class="breakdown-group">
+        <div class="breakdown-header">
+          <span class="breakdown-dot dot-amber"></span>
+          <span class="breakdown-title">Gastos Variables</span>
+          <span class="breakdown-subtotal" id="bs-variables">PEN 0.00</span>
+        </div>
+        <div class="breakdown-items" id="bi-variables"></div>
+      </div>
+      <div class="breakdown-group">
+        <div class="breakdown-header">
+          <span class="breakdown-dot dot-blue"></span>
+          <span class="breakdown-title">Ahorros</span>
+          <span class="breakdown-subtotal" id="bs-ahorros">PEN 0.00</span>
+        </div>
+        <div class="breakdown-items" id="bi-ahorros"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const PEN = v => `PEN ${parseFloat(v).toFixed(2)}`;
+    const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    let pickerYear, selectedMonth = null, activeYear, activeMonth;
+
+    function initPicker() {
+      const now = new Date();
+      pickerYear = now.getFullYear();
+      renderPicker();
+    }
+
+    function renderPicker() {
+      document.getElementById('py-val').textContent = pickerYear;
+      const grid = document.getElementById('picker-months');
+      grid.innerHTML = MONTHS.map((m, i) =>
+        `<button class="picker-month-btn${selectedMonth === i && pickerYear === (activeYear || pickerYear) ? ' selected' : ''}"
+          data-i="${i}">${m}</button>`
+      ).join('');
+      grid.querySelectorAll('.picker-month-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedMonth = parseInt(btn.dataset.i);
+          grid.querySelectorAll('.picker-month-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          document.getElementById('picker-confirm').disabled = false;
+        });
+      });
+    }
+
+    document.getElementById('py-prev').addEventListener('click', () => { pickerYear--; selectedMonth = null; document.getElementById('picker-confirm').disabled = true; renderPicker(); });
+    document.getElementById('py-next').addEventListener('click', () => { pickerYear++; selectedMonth = null; document.getElementById('picker-confirm').disabled = true; renderPicker(); });
+
+    document.getElementById('picker-confirm').addEventListener('click', () => {
+      activeYear = pickerYear;
+      activeMonth = selectedMonth;
+      showResumen();
+    });
+
+    document.getElementById('changePeriod').addEventListener('click', () => {
+      document.getElementById('view-resumen').style.display = 'none';
+      document.getElementById('view-selector').style.display = 'flex';
+    });
+
+    function showResumen() {
+      document.getElementById('view-selector').style.display = 'none';
+      document.getElementById('view-resumen').style.display = 'flex';
+      document.getElementById('r-period-label').textContent = `${MONTHS[activeMonth]} ${activeYear}`;
+      renderResumen();
+    }
+
+    function sum(arr) { return arr.reduce((s, e) => s + e.amount, 0); }
+
+    function renderItems(id, entries) {
+      const el = document.getElementById(id);
+      el.innerHTML = !entries.length
+        ? `<span class="breakdown-empty">Sin entradas</span>`
+        : entries.map(e => `<div class="breakdown-row">
+            <span class="breakdown-row-name">${e.name}</span>
+            <span class="breakdown-row-amt">${PEN(e.amount)}</span>
+          </div>`).join('');
+    }
+
+    function renderResumen() {
+      const key = `moneytracker-${activeYear}-${String(activeMonth + 1).padStart(2, '0')}`;
+      const raw = localStorage.getItem(key);
+      const d = raw ? JSON.parse(raw) : { ingresos:[], fijos:[], variables:[], ahorros:[] };
+
+      const tI = sum(d.ingresos), tF = sum(d.fijos), tV = sum(d.variables), tA = sum(d.ahorros);
+      const tG = tF + tV + tA;
+      const bal = tI - tG;
+
+      document.getElementById('r-balance').textContent = PEN(bal);
+      document.getElementById('r-balance').style.color = bal >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+      document.getElementById('r-ingresos').textContent = PEN(tI);
+      document.getElementById('r-gastos').textContent   = PEN(tG);
+
+      const pct = tI > 0 ? Math.min((tG / tI) * 100, 100) : 0;
+      document.getElementById('r-bar').style.width = pct + '%';
+
+      ['ingresos','fijos','variables','ahorros'].forEach(c => {
+        document.getElementById(`bs-${c}`).textContent = PEN(sum(d[c]));
+        renderItems(`bi-${c}`, d[c]);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initPicker);
+  </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0c12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MoneyTracker" />
+  <title>MoneyTracker - Gastos e Ingresos</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn">&#8592;</a>
+      <div class="topbar-brand">
+        <span class="brand-name">MoneyTracker</span>
+      </div>
+    </div>
+    <div class="topbar-period">
+      <button class="period-btn" id="prevMonth">&#8592;</button>
+      <span id="currentPeriod"></span>
+      <button class="period-btn" id="nextMonth">&#8594;</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary-bar">
+      <div class="summary-card" id="sum-ingresos">
+        <span class="sum-label">Ingresos</span>
+        <span class="sum-amount" id="total-ingresos">PEN 0.00</span>
+      </div>
+      <div class="summary-card" id="sum-balance">
+        <span class="sum-label">Balance</span>
+        <span class="sum-amount" id="total-balance">PEN 0.00</span>
+      </div>
+      <div class="summary-card" id="sum-gastos">
+        <span class="sum-label">Gastos</span>
+        <span class="sum-amount" id="total-gastos">PEN 0.00</span>
+      </div>
+    </section>
+
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="ingresos">Ingresos</button>
+      <button class="tab-btn" data-tab="fijos">Gastos Fijos</button>
+      <button class="tab-btn" data-tab="variables">Variables</button>
+      <button class="tab-btn" data-tab="ahorros">Ahorros</button>
+    </nav>
+
+    <div class="tab-content active" id="tab-ingresos" data-category="ingresos">
+      <div class="category-header">
+        <div class="category-meta">
+          <span class="category-icon">↑</span>
+          <div>
+            <h2>Ingresos</h2>
+          </div>
+        </div>
+        <span class="category-total" id="cat-total-ingresos">PEN 0.00</span>
+      </div>
+      <div class="entries-list" id="list-ingresos"></div>
+      <div class="add-entry-form" id="form-ingresos">
+        <input type="text" class="input-name" placeholder="Nombre del ingreso" maxlength="60" />
+        <input type="number" class="input-amount" placeholder="0.00" step="0.01" min="0" />
+        <button class="btn-add">+ Agregar</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-fijos" data-category="fijos">
+      <div class="category-header">
+        <div class="category-meta">
+          <span class="category-icon">↓</span>
+          <div>
+            <h2>Gastos Fijos</h2>
+          </div>
+        </div>
+        <span class="category-total" id="cat-total-fijos">PEN 0.00</span>
+      </div>
+      <div class="entries-list" id="list-fijos"></div>
+      <div class="add-entry-form" id="form-fijos">
+        <input type="text" class="input-name" placeholder="Nombre del gasto fijo" maxlength="60" />
+        <input type="number" class="input-amount" placeholder="0.00" step="0.01" min="0" />
+        <button class="btn-add">+ Agregar</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-variables" data-category="variables">
+      <div class="category-header">
+        <div class="category-meta">
+          <span class="category-icon">~</span>
+          <div>
+            <h2>Gastos Variables</h2>
+          </div>
+        </div>
+        <span class="category-total" id="cat-total-variables">PEN 0.00</span>
+      </div>
+      <div class="entries-list" id="list-variables"></div>
+      <div class="add-entry-form" id="form-variables">
+        <input type="text" class="input-name" placeholder="Nombre del gasto variable" maxlength="60" />
+        <input type="number" class="input-amount" placeholder="0.00" step="0.01" min="0" />
+        <button class="btn-add">+ Agregar</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-ahorros" data-category="ahorros">
+      <div class="category-header">
+        <div class="category-meta">
+          <span class="category-icon">◆</span>
+          <div>
+            <h2>Ahorros</h2>
+          </div>
+        </div>
+        <span class="category-total" id="cat-total-ahorros">PEN 0.00</span>
+      </div>
+      <div class="entries-list" id="list-ahorros"></div>
+      <div class="add-entry-form" id="form-ahorros">
+        <input type="text" class="input-name" placeholder="Nombre del ahorro" maxlength="60" />
+        <input type="number" class="input-amount" placeholder="0.00" step="0.01" min="0" />
+        <button class="btn-add">+ Agregar</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3>Editar entrada</h3>
+      <input type="text" id="edit-name" placeholder="Nombre" maxlength="60" />
+      <input type="number" id="edit-amount" placeholder="0.00" step="0.01" min="0" />
+      <div class="modal-actions">
+        <button class="btn-cancel" id="cancelEdit">Cancelar</button>
+        <button class="btn-save" id="saveEdit">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="deleteToast">
+    <span id="toastMsg">Entrada eliminada</span>
+    <button id="undoBtn">Deshacer</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
