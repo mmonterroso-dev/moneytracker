@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0c12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MoneyTracker" />
+  <title>MoneyTracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icono-moneda.png" />
+  <link rel="apple-touch-icon" href="icono-moneda.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="home-page">
+    <div class="splash" id="splash">
+    <div class="splash-inner">
+      <img src="icono-moneda.png" alt="" class="splash-icon" />
+      <span class="splash-name">MoneyTracker</span>
+    </div>
+  </div>
+
+  <div class="grain"></div>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="home-wrapper">
+    <header class="home-header">
+      <div class="home-brand">
+        <span class="home-coin-icon"><img src="icono-moneda.png" alt="MoneyTracker" class="home-coin-img" /></span>
+        <h1 class="home-title">MoneyTracker</h1>
+      </div>
+      <p class="home-subtitle">Your wallet with one tap</p>
+    </header>
+
+    <nav class="home-nav">
+
+      <a href="tracker.html" class="home-card card-tracker">
+        <div class="card-glow glow-green"></div>
+        <div class="card-inner">
+          <div class="card-icon-wrap">
+            <img src="icono-wallet.png" alt="Tracker" class="card-custom-img" id="trackerLogo"
+              onerror="this.style.display='none';document.getElementById('trackerFallback').style.display='flex'" />
+            <div class="card-icon-fallback" id="trackerFallback">
+              <span>↕</span>
+            </div>
+          </div>
+          <div class="card-text">
+            <span class="card-label">Gastos e Ingresos</span>
+          </div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+      <a href="resumen.html" class="home-card card-resumen">
+        <div class="card-glow glow-blue"></div>
+        <div class="card-inner">
+          <div class="card-icon-wrap icon-symbol">
+            <span>≡</span>
+          </div>
+          <div class="card-text">
+            <span class="card-label">Resumen</span>
+          </div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+      <a href="ahorros.html" class="home-card card-ahorros">
+        <div class="card-glow glow-amber"></div>
+        <div class="card-inner">
+          <div class="card-icon-wrap icon-symbol icon-amber">
+            <span>◆</span>
+          </div>
+          <div class="card-text">
+            <span class="card-label">Ahorros</span>
+          </div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+    </nav>
+
+    <footer class="home-footer">
+      <span id="home-period"></span>
+    </footer>
+  </div>
+
+  <script>
+    const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const now = new Date();
+    document.getElementById('home-period').textContent = `${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+
+    document.querySelectorAll('.home-card').forEach(card => {
+      card.addEventListener('touchstart', () => card.classList.add('tapped'), { passive: true });
+      card.addEventListener('touchend',   () => card.classList.remove('tapped'));
+      card.addEventListener('touchcancel',() => card.classList.remove('tapped'));
+    });
+
+    window.addEventListener('load', () => {
+      const splash = document.getElementById('splash');
+      setTimeout(() => {
+        splash.classList.add('splash-hide');
+        setTimeout(() => splash.remove(), 600);
+      }, 1200);
+    });
+  </script>
+</body>
+</html>
