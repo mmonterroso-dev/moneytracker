@@ -90,6 +90,12 @@
     const now = new Date();
     document.getElementById('home-period').textContent = `${months[now.getMonth()]} ${now.getFullYear()}`;
     if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+    
+    document.querySelectorAll('.home-card').forEach(card => {
+      card.addEventListener('touchstart', () => card.classList.add('tapped'), { passive: true });
+      card.addEventListener('touchend',   () => card.classList.remove('tapped'));
+      card.addEventListener('touchcancel',() => card.classList.remove('tapped'));
+    });
   </script>
 </body>
 </html>

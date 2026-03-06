@@ -27,7 +27,6 @@
     </div>
   </header>
 
-  <!-- SELECTOR VIEW -->
   <div id="view-selector" class="picker-view picker-view-centered">
     <div class="picker-wrapper">
       <h2 class="picker-title">Selecciona mes<br>y año</h2>
@@ -41,7 +40,6 @@
     </div>
   </div>
 
-  <!-- RESUMEN VIEW -->
   <div id="view-resumen" class="resumen-main" style="display:none">
 
     <div class="resumen-period-bar">
@@ -53,7 +51,7 @@
       <span class="resumen-hero-label">Distribución del mes</span>
 
       <div class="donut-wrap">
-        <canvas id="donutCanvas" width="260" height="260"></canvas>
+        <canvas id="donutCanvas" width="200" height="200"></canvas>
         <div class="donut-center">
           <span class="donut-center-label">Balance</span>
           <span class="donut-center-amount" id="donut-balance">PEN 0.00</span>
@@ -195,7 +193,7 @@
       const size = canvas.width;
       const cx = size / 2, cy = size / 2;
       const outerR = size * 0.46;
-      const innerR = size * 0.30;
+      const innerR = size * 0.34;
       const total = values.reduce((s, v) => s + v, 0);
 
       ctx.clearRect(0, 0, size, size);
@@ -232,7 +230,6 @@
         startAngle += slice + gapAngle;
       });
 
-      // Center hole fill with app background color
       ctx.beginPath();
       ctx.arc(cx, cy, innerR - 1, 0, Math.PI * 2);
       ctx.fillStyle = BG_COLOR;
