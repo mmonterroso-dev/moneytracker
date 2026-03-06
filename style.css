@@ -879,3 +879,96 @@ body {
   height: 36px;
   object-fit: contain;
 }
+
+/* ─── PICKER CENTRADO ────────────────────── */
+.picker-view-centered {
+  min-height: calc(100dvh - 57px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── DONUT CHART ────────────────────────── */
+.donut-wrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 16px auto 0;
+}
+
+.donut-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut-track {
+  fill: none;
+  stroke: #1c2030;
+  stroke-width: 22;
+}
+
+.donut-seg {
+  fill: none;
+  stroke-width: 22;
+  stroke-linecap: butt;
+  transition: stroke-dasharray 700ms cubic-bezier(0.4,0,0.2,1),
+              stroke-dashoffset 700ms cubic-bezier(0.4,0,0.2,1);
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.donut-center-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.donut-center-amount {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.donut-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin-top: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-name {
+  font-size: 12px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.legend-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+}

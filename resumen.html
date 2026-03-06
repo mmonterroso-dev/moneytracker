@@ -22,14 +22,16 @@
     <div class="topbar-left">
       <a href="index.html" class="back-btn">&#8592;</a>
       <div class="topbar-brand">
+        <span class="brand-symbol">PEN</span>
         <span class="brand-name">Resumen</span>
       </div>
     </div>
   </header>
 
   <!-- SELECTOR VIEW -->
-  <div id="view-selector" class="picker-view">
+  <div id="view-selector" class="picker-view picker-view-centered">
     <div class="picker-wrapper">
+      <p class="picker-eyebrow">¿Qué período quieres ver?</p>
       <h2 class="picker-title">Selecciona mes<br>y año</h2>
 
       <div class="picker-year-row">
@@ -52,17 +54,30 @@
       <button class="resumen-change-btn" id="changePeriod">Cambiar</button>
     </div>
 
+    <!-- DONUT CHART -->
     <section class="resumen-hero">
       <span class="resumen-hero-label">Balance del mes</span>
       <span class="resumen-hero-amount" id="r-balance">PEN 0.00</span>
-      <div class="balance-bar-wrap">
-        <div class="balance-bar-track">
-          <div class="balance-bar-fill" id="r-bar"></div>
+
+      <div class="donut-wrap">
+        <svg class="donut-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle class="donut-track" cx="100" cy="100" r="76"/>
+          <circle class="donut-seg" id="seg-ingresos"  cx="100" cy="100" r="76"/>
+          <circle class="donut-seg" id="seg-fijos"     cx="100" cy="100" r="76"/>
+          <circle class="donut-seg" id="seg-variables" cx="100" cy="100" r="76"/>
+          <circle class="donut-seg" id="seg-ahorros"   cx="100" cy="100" r="76"/>
+        </svg>
+        <div class="donut-center">
+          <span class="donut-center-label">Balance</span>
+          <span class="donut-center-amount" id="donut-balance">PEN 0.00</span>
         </div>
-        <div class="balance-bar-labels">
-          <span>Gastos</span>
-          <span>Ingresos</span>
-        </div>
+      </div>
+
+      <div class="donut-legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#3ddc84"></span><span class="legend-name">Ingresos</span><span class="legend-val" id="leg-ingresos">PEN 0.00</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ff5f6d"></span><span class="legend-name">G. Fijos</span><span class="legend-val" id="leg-fijos">PEN 0.00</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ffb547"></span><span class="legend-name">G. Variables</span><span class="legend-val" id="leg-variables">PEN 0.00</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#5b9cf6"></span><span class="legend-name">Ahorros</span><span class="legend-val" id="leg-ahorros">PEN 0.00</span></div>
       </div>
     </section>
 
@@ -117,12 +132,12 @@
   <script>
     const PEN = v => `PEN ${parseFloat(v).toFixed(2)}`;
     const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const CIRCUMFERENCE = 2 * Math.PI * 76;
 
     let pickerYear, selectedMonth = null, activeYear, activeMonth;
 
     function initPicker() {
-      const now = new Date();
-      pickerYear = now.getFullYear();
+      pickerYear = new Date().getFullYear();
       renderPicker();
     }
 
@@ -130,8 +145,7 @@
       document.getElementById('py-val').textContent = pickerYear;
       const grid = document.getElementById('picker-months');
       grid.innerHTML = MONTHS.map((m, i) =>
-        `<button class="picker-month-btn${selectedMonth === i && pickerYear === (activeYear || pickerYear) ? ' selected' : ''}"
-          data-i="${i}">${m}</button>`
+        `<button class="picker-month-btn${selectedMonth === i ? ' selected' : ''}" data-i="${i}">${m}</button>`
       ).join('');
       grid.querySelectorAll('.picker-month-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -145,13 +159,7 @@
 
     document.getElementById('py-prev').addEventListener('click', () => { pickerYear--; selectedMonth = null; document.getElementById('picker-confirm').disabled = true; renderPicker(); });
     document.getElementById('py-next').addEventListener('click', () => { pickerYear++; selectedMonth = null; document.getElementById('picker-confirm').disabled = true; renderPicker(); });
-
-    document.getElementById('picker-confirm').addEventListener('click', () => {
-      activeYear = pickerYear;
-      activeMonth = selectedMonth;
-      showResumen();
-    });
-
+    document.getElementById('picker-confirm').addEventListener('click', () => { activeYear = pickerYear; activeMonth = selectedMonth; showResumen(); });
     document.getElementById('changePeriod').addEventListener('click', () => {
       document.getElementById('view-resumen').style.display = 'none';
       document.getElementById('view-selector').style.display = 'flex';
@@ -176,6 +184,41 @@
           </div>`).join('');
     }
 
+    function renderDonut(tI, tF, tV, tA) {
+      const COLORS = { ingresos: '#3ddc84', fijos: '#ff5f6d', variables: '#ffb547', ahorros: '#5b9cf6' };
+      const total = tI + tF + tV + tA;
+      const segs = [
+        { id: 'seg-ingresos',  val: tI, color: COLORS.ingresos },
+        { id: 'seg-fijos',     val: tF, color: COLORS.fijos },
+        { id: 'seg-variables', val: tV, color: COLORS.variables },
+        { id: 'seg-ahorros',   val: tA, color: COLORS.ahorros },
+      ];
+
+      let offset = CIRCUMFERENCE * 0.25;
+
+      segs.forEach(seg => {
+        const el = document.getElementById(seg.id);
+        if (total === 0) {
+          el.style.strokeDasharray = '0';
+          el.style.strokeDashoffset = '0';
+          el.style.stroke = 'transparent';
+          return;
+        }
+        const pct = seg.val / total;
+        const dash = pct * CIRCUMFERENCE;
+        const gap  = CIRCUMFERENCE - dash;
+        el.style.stroke = seg.color;
+        el.style.strokeDasharray  = `${dash} ${gap}`;
+        el.style.strokeDashoffset = -offset + CIRCUMFERENCE * 0.25;
+        offset += dash;
+      });
+
+      if (total === 0) {
+        const track = document.querySelector('.donut-track');
+        track.style.stroke = '#1c2030';
+      }
+    }
+
     function renderResumen() {
       const key = `moneytracker-${activeYear}-${String(activeMonth + 1).padStart(2, '0')}`;
       const raw = localStorage.getItem(key);
@@ -185,13 +228,20 @@
       const tG = tF + tV + tA;
       const bal = tI - tG;
 
+      const balColor = bal >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
       document.getElementById('r-balance').textContent = PEN(bal);
-      document.getElementById('r-balance').style.color = bal >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+      document.getElementById('r-balance').style.color = balColor;
+      document.getElementById('donut-balance').textContent = PEN(bal);
+      document.getElementById('donut-balance').style.color = balColor;
       document.getElementById('r-ingresos').textContent = PEN(tI);
       document.getElementById('r-gastos').textContent   = PEN(tG);
 
-      const pct = tI > 0 ? Math.min((tG / tI) * 100, 100) : 0;
-      document.getElementById('r-bar').style.width = pct + '%';
+      document.getElementById('leg-ingresos').textContent  = PEN(tI);
+      document.getElementById('leg-fijos').textContent     = PEN(tF);
+      document.getElementById('leg-variables').textContent = PEN(tV);
+      document.getElementById('leg-ahorros').textContent   = PEN(tA);
+
+      renderDonut(tI, tF, tV, tA);
 
       ['ingresos','fijos','variables','ahorros'].forEach(c => {
         document.getElementById(`bs-${c}`).textContent = PEN(sum(d[c]));
