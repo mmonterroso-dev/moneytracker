@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0c12" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>MoneyTracker — Resumen</title>
+  <title>MoneyTracker - Resumen</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icono-moneda.png" />
   <link rel="apple-touch-icon" href="icono-moneda.png" />
@@ -22,7 +22,6 @@
     <div class="topbar-left">
       <a href="index.html" class="back-btn">&#8592;</a>
       <div class="topbar-brand">
-        <span class="brand-symbol">PEN</span>
         <span class="brand-name">Resumen</span>
       </div>
     </div>
@@ -31,17 +30,13 @@
   <!-- SELECTOR VIEW -->
   <div id="view-selector" class="picker-view picker-view-centered">
     <div class="picker-wrapper">
-      <p class="picker-eyebrow">¿Qué período quieres ver?</p>
       <h2 class="picker-title">Selecciona mes<br>y año</h2>
-
       <div class="picker-year-row">
         <button class="picker-arrow" id="py-prev">&#8592;</button>
         <span class="picker-year-val" id="py-val"></span>
         <button class="picker-arrow" id="py-next">&#8594;</button>
       </div>
-
       <div class="picker-months" id="picker-months"></div>
-
       <button class="picker-confirm" id="picker-confirm" disabled>Ver resumen</button>
     </div>
   </div>
@@ -54,19 +49,11 @@
       <button class="resumen-change-btn" id="changePeriod">Cambiar</button>
     </div>
 
-    <!-- DONUT CHART -->
     <section class="resumen-hero">
-      <span class="resumen-hero-label">Balance del mes</span>
-      <span class="resumen-hero-amount" id="r-balance">PEN 0.00</span>
+      <span class="resumen-hero-label">Distribución del mes</span>
 
       <div class="donut-wrap">
-        <svg class="donut-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <circle class="donut-track" cx="100" cy="100" r="76"/>
-          <circle class="donut-seg" id="seg-ingresos"  cx="100" cy="100" r="76"/>
-          <circle class="donut-seg" id="seg-fijos"     cx="100" cy="100" r="76"/>
-          <circle class="donut-seg" id="seg-variables" cx="100" cy="100" r="76"/>
-          <circle class="donut-seg" id="seg-ahorros"   cx="100" cy="100" r="76"/>
-        </svg>
+        <canvas id="donutCanvas" width="260" height="260"></canvas>
         <div class="donut-center">
           <span class="donut-center-label">Balance</span>
           <span class="donut-center-amount" id="donut-balance">PEN 0.00</span>
@@ -74,10 +61,26 @@
       </div>
 
       <div class="donut-legend">
-        <div class="legend-item"><span class="legend-dot" style="background:#3ddc84"></span><span class="legend-name">Ingresos</span><span class="legend-val" id="leg-ingresos">PEN 0.00</span></div>
-        <div class="legend-item"><span class="legend-dot" style="background:#ff5f6d"></span><span class="legend-name">G. Fijos</span><span class="legend-val" id="leg-fijos">PEN 0.00</span></div>
-        <div class="legend-item"><span class="legend-dot" style="background:#ffb547"></span><span class="legend-name">G. Variables</span><span class="legend-val" id="leg-variables">PEN 0.00</span></div>
-        <div class="legend-item"><span class="legend-dot" style="background:#5b9cf6"></span><span class="legend-name">Ahorros</span><span class="legend-val" id="leg-ahorros">PEN 0.00</span></div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#3ddc84"></span>
+          <span class="legend-name">Ingresos</span>
+          <span class="legend-val" id="leg-ingresos">PEN 0.00</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#ff5f6d"></span>
+          <span class="legend-name">G. Fijos</span>
+          <span class="legend-val" id="leg-fijos">PEN 0.00</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#ffb547"></span>
+          <span class="legend-name">G. Variables</span>
+          <span class="legend-val" id="leg-variables">PEN 0.00</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#5b9cf6"></span>
+          <span class="legend-name">Ahorros</span>
+          <span class="legend-val" id="leg-ahorros">PEN 0.00</span>
+        </div>
       </div>
     </section>
 
@@ -132,7 +135,9 @@
   <script>
     const PEN = v => `PEN ${parseFloat(v).toFixed(2)}`;
     const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    const CIRCUMFERENCE = 2 * Math.PI * 76;
+    const BG_COLOR = '#0c0e14';
+    const COLORS = ['#3ddc84', '#ff5f6d', '#ffb547', '#5b9cf6'];
+    const GAP = 0.018;
 
     let pickerYear, selectedMonth = null, activeYear, activeMonth;
 
@@ -184,39 +189,54 @@
           </div>`).join('');
     }
 
-    function renderDonut(tI, tF, tV, tA) {
-      const COLORS = { ingresos: '#3ddc84', fijos: '#ff5f6d', variables: '#ffb547', ahorros: '#5b9cf6' };
-      const total = tI + tF + tV + tA;
-      const segs = [
-        { id: 'seg-ingresos',  val: tI, color: COLORS.ingresos },
-        { id: 'seg-fijos',     val: tF, color: COLORS.fijos },
-        { id: 'seg-variables', val: tV, color: COLORS.variables },
-        { id: 'seg-ahorros',   val: tA, color: COLORS.ahorros },
-      ];
+    function drawDonut(values) {
+      const canvas = document.getElementById('donutCanvas');
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const cx = size / 2, cy = size / 2;
+      const outerR = size * 0.46;
+      const innerR = size * 0.30;
+      const total = values.reduce((s, v) => s + v, 0);
 
-      let offset = CIRCUMFERENCE * 0.25;
-
-      segs.forEach(seg => {
-        const el = document.getElementById(seg.id);
-        if (total === 0) {
-          el.style.strokeDasharray = '0';
-          el.style.strokeDashoffset = '0';
-          el.style.stroke = 'transparent';
-          return;
-        }
-        const pct = seg.val / total;
-        const dash = pct * CIRCUMFERENCE;
-        const gap  = CIRCUMFERENCE - dash;
-        el.style.stroke = seg.color;
-        el.style.strokeDasharray  = `${dash} ${gap}`;
-        el.style.strokeDashoffset = -offset + CIRCUMFERENCE * 0.25;
-        offset += dash;
-      });
+      ctx.clearRect(0, 0, size, size);
 
       if (total === 0) {
-        const track = document.querySelector('.donut-track');
-        track.style.stroke = '#1c2030';
+        ctx.beginPath();
+        ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+        ctx.arc(cx, cy, innerR, 0, Math.PI * 2, true);
+        ctx.fillStyle = '#1c2030';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+        ctx.fillStyle = BG_COLOR;
+        ctx.fill();
+        return;
       }
+
+      let startAngle = -Math.PI / 2;
+      const nonZero = values.filter(v => v > 0).length;
+      const gapAngle = nonZero > 1 ? GAP : 0;
+
+      values.forEach((val, i) => {
+        if (val <= 0) return;
+        const slice = (val / total) * (Math.PI * 2) - gapAngle;
+
+        ctx.beginPath();
+        ctx.moveTo(cx + outerR * Math.cos(startAngle + gapAngle / 2), cy + outerR * Math.sin(startAngle + gapAngle / 2));
+        ctx.arc(cx, cy, outerR, startAngle + gapAngle / 2, startAngle + slice + gapAngle / 2);
+        ctx.arc(cx, cy, innerR, startAngle + slice + gapAngle / 2, startAngle + gapAngle / 2, true);
+        ctx.closePath();
+        ctx.fillStyle = COLORS[i];
+        ctx.fill();
+
+        startAngle += slice + gapAngle;
+      });
+
+      // Center hole fill with app background color
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerR - 1, 0, Math.PI * 2);
+      ctx.fillStyle = BG_COLOR;
+      ctx.fill();
     }
 
     function renderResumen() {
@@ -229,8 +249,6 @@
       const bal = tI - tG;
 
       const balColor = bal >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-      document.getElementById('r-balance').textContent = PEN(bal);
-      document.getElementById('r-balance').style.color = balColor;
       document.getElementById('donut-balance').textContent = PEN(bal);
       document.getElementById('donut-balance').style.color = balColor;
       document.getElementById('r-ingresos').textContent = PEN(tI);
@@ -241,7 +259,7 @@
       document.getElementById('leg-variables').textContent = PEN(tV);
       document.getElementById('leg-ahorros').textContent   = PEN(tA);
 
-      renderDonut(tI, tF, tV, tA);
+      drawDonut([tI, tF, tV, tA]);
 
       ['ingresos','fijos','variables','ahorros'].forEach(c => {
         document.getElementById(`bs-${c}`).textContent = PEN(sum(d[c]));
