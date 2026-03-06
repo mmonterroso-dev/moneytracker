@@ -121,27 +121,28 @@
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playKeyClick() {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const noise = ctx.createBuffer(1, ctx.sampleRate * 0.015, ctx.sampleRate);
+      const data  = noise.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+      }
+
+      const src    = ctx.createBufferSource();
+      src.buffer   = noise;
+
       const filter = ctx.createBiquadFilter();
+      filter.type            = 'bandpass';
+      filter.frequency.value = 3500;
+      filter.Q.value         = 0.8;
 
-      filter.type = 'lowpass';
-      filter.frequency.value = 900;
-      filter.Q.value = 0.5;
+      const gain      = ctx.createGain();
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.015);
 
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(180, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.04);
-
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
-
-      osc.connect(filter);
+      src.connect(filter);
       filter.connect(gain);
       gain.connect(ctx.destination);
-
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.06);
+      src.start();
     }
 
     function typeWriter() {
