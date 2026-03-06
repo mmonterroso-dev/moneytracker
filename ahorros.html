@@ -45,7 +45,17 @@
         <circle class="ring-fill" id="ringFill" cx="100" cy="100" r="80" />
         <text class="ring-pct" id="ringPct" x="100" y="107" text-anchor="middle">0%</text>
       </svg>
-      <p class="ring-caption">de tus ingresos totales</p>
+      <p class="ring-caption" id="ring-caption">de tus ingresos totales</p>
+
+      <div class="ring-toggle">
+        <button class="ring-toggle-btn active" id="btn-totales">Ahorros totales</button>
+        <button class="ring-toggle-btn" id="btn-meta">Meta de ahorro</button>
+      </div>
+
+      <div class="goal-form" id="goal-form">
+        <input type="number" inputmode="decimal" class="goal-input" id="goal-input" placeholder="Ingresa tu meta en PEN" step="0.01" min="0" />
+        <button class="goal-confirm" id="goal-confirm">Establecer meta</button>
+      </div>
     </section>
 
     <section class="ahorros-list-section">
@@ -56,6 +66,9 @@
   </main>
 
   <script>
+    let goalMode = false;
+    let goalAmount = 0;
+
     const PEN = v => `PEN ${parseFloat(v).toFixed(2)}`;
     const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     const CIRCUMFERENCE = 2 * Math.PI * 80;
@@ -93,10 +106,18 @@
       return periods.sort((a, b) => b.year - a.year || b.month - a.month);
     }
 
-    function animateRing(pct) {
-      const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
-      document.getElementById('ringFill').style.strokeDashoffset = offset;
-      document.getElementById('ringPct').textContent = Math.round(pct) + '%';
+    function animateRing(pct, caption) {
+      const fill = document.getElementById('ringFill');
+      const pctEl = document.getElementById('ringPct');
+      const cap   = document.getElementById('ring-caption');
+      fill.style.transition = 'none';
+      fill.style.strokeDashoffset = CIRCUMFERENCE;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        fill.style.transition = 'stroke-dashoffset 1000ms cubic-bezier(0.4,0,0.2,1)';
+        fill.style.strokeDashoffset = CIRCUMFERENCE - (Math.min(pct, 100) / 100) * CIRCUMFERENCE;
+        pctEl.textContent = Math.round(pct) + '%';
+        if (caption) cap.textContent = caption;
+      }));
     }
 
     function render() {
@@ -121,7 +142,7 @@
       document.getElementById('a-sub').textContent = totalIngresos > 0
         ? `Sobre un total de ${PEN(totalIngresos)} en ingresos`
         : 'Agrega ingresos para ver el porcentaje';
-      animateRing(pct);
+      if (!goalMode) animateRing(pct, 'de tus ingresos totales');
 
       const list = document.getElementById('a-list');
       if (!byMonth.length) {
@@ -143,6 +164,60 @@
         </div>`;
       }).join('');
     }
+
+
+    function showGoalResult(total, goal) {
+      const pct = goal > 0 ? (total / goal) * 100 : 0;
+      const remaining = Math.max(goal - total, 0);
+      const caption = remaining > 0
+        ? 'Te faltan PEN ' + remaining.toFixed(2) + ' para tu meta'
+        : '¡Meta alcanzada!';
+      animateRing(pct, caption);
+      countUp(document.getElementById('a-total'), total);
+      document.getElementById('a-sub').textContent = 'Meta: PEN ' + goal.toFixed(2);
+    }
+
+    document.getElementById('btn-totales').addEventListener('click', () => {
+      goalMode = false;
+      document.getElementById('btn-totales').classList.add('active');
+      document.getElementById('btn-meta').classList.remove('active');
+      const form = document.getElementById('goal-form');
+      form.classList.remove('goal-form-visible');
+      render();
+    });
+
+    document.getElementById('btn-meta').addEventListener('click', () => {
+      document.getElementById('btn-meta').classList.add('active');
+      document.getElementById('btn-totales').classList.remove('active');
+      const form = document.getElementById('goal-form');
+      form.classList.add('goal-form-visible');
+      if (goalAmount > 0) {
+        goalMode = true;
+        const periods = getAllPeriods();
+        let totalAhorros = 0;
+        periods.forEach(p => {
+          const raw = localStorage.getItem(p.key);
+          if (!raw) return;
+          totalAhorros += sum(JSON.parse(raw).ahorros);
+        });
+        showGoalResult(totalAhorros, goalAmount);
+      }
+    });
+
+    document.getElementById('goal-confirm').addEventListener('click', () => {
+      const val = parseFloat(document.getElementById('goal-input').value);
+      if (!val || val <= 0) return;
+      goalAmount = val;
+      goalMode = true;
+      const periods = getAllPeriods();
+      let totalAhorros = 0;
+      periods.forEach(p => {
+        const raw = localStorage.getItem(p.key);
+        if (!raw) return;
+        totalAhorros += sum(JSON.parse(raw).ahorros);
+      });
+      showGoalResult(totalAhorros, goalAmount);
+    });
 
     document.addEventListener('DOMContentLoaded', render);
   </script>

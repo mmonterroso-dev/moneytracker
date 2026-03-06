@@ -1158,3 +1158,79 @@ body {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ─── RING TOGGLE BUTTONS ────────────────── */
+.ring-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.ring-toggle-btn {
+  flex: 1;
+  padding: 10px 14px;
+  background: none;
+  border: 1px solid #2e3450;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 200ms, color 200ms, background 200ms;
+}
+
+.ring-toggle-btn.active {
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+  background: rgba(255,181,71,0.08);
+}
+
+/* ─── GOAL FORM ──────────────────────────── */
+.goal-form {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 350ms ease, opacity 350ms ease, margin 350ms ease;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+.goal-form-visible {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 12px;
+}
+
+.goal-form > * { min-height: 0; }
+
+.goal-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--surface);
+  border: 1px solid #2e3450;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-size: 16px !important;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.goal-input:focus {
+  outline: none;
+  border-color: var(--accent-amber);
+}
+
+.goal-confirm {
+  width: 100%;
+  padding: 11px;
+  background: var(--accent-amber);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #0a0c12;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
